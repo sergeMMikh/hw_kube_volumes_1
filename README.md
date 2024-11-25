@@ -6,17 +6,6 @@
 
 ------
 
-
-------
-
-### Дополнительные материалы для выполнения задания
-
-1. [Инструкция по установке MicroK8S](https://microk8s.io/docs/getting-started).
-2. [Описание Volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
-3. [Описание Multitool](https://github.com/wbitt/Network-MultiTool).
-
-------
-
 ### Задание 1 
 
 **Что нужно сделать**
@@ -68,6 +57,8 @@ done;
 
 <img src="images/Task_1_2.png" alt="Task_1_2.png" width="400" height="auto"></br>
 
+-----
+
 ### Задание 2
 
 **Что нужно сделать**
@@ -81,10 +72,26 @@ done;
 
 ------
 
-### Правила приёма работы
+**Решение**
 
-1. Домашняя работа оформляется в своём Git-репозитории в файле README.md. Выполненное задание пришлите ссылкой на .md-файл в вашем репозитории.
-2. Файл README.md должен содержать скриншоты вывода необходимых команд `kubectl`, а также скриншоты результатов.
-3. Репозиторий должен содержать тексты манифестов или ссылки на них в файле README.md.
+Создал DaemonSet приложение [log-reader-daemonset.yaml](manifests/log-reader-daemonset.yaml), состоящеее из multitool.
+
+multitool каждые 10 секунд считывает содержимое файла /host-logs/syslog и выводит его в лог:
+
+```
+while true; do
+  echo "Reading /var/log/syslog:";
+  cat /host-logs/syslog || echo "Log file not found";
+  sleep 10;
+done;
+```
+
+Том host-logs типа hostPath подключает директорию `/var/log` хоста к директории `/host-logs` внутри контейнера. Указывая `readOnly: true` защищаем хостовые данные от записи.
+
+Получил список подов: `microk8s kubectl get pods -o wide`
+
+Вывел последние 10 строчек логов пода: `microk8s kubectl logs log-reader-hz5hc --tail=10 -f`
+
+<img src="images/Task_2_1.png" alt="Task_2_1.png" width="400" height="auto"></br>
 
 ------
