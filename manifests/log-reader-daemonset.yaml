@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: log-reader
+  labels:
+    app: log-reader
+spec:
+  selector:
+    matchLabels:
+      app: log-reader
+  template:
+    metadata:
+      labels:
+        app: log-reader
+    spec:
+      containers:
+        - name: multitool
+          image: praqma/network-multitool
+          command:
+            - /bin/sh
+            - -c
+            - >
+              while true; do
+                echo "Reading /var/log/syslog:";
+                cat /host-logs/syslog || echo "Log file not found";
+                sleep 10;
+              done;
+          volumeMounts:
+            - name: host-logs
+              mountPath: /host-logs
+              readOnly: true
+      volumes:
+        - name: host-logs
+          hostPath:
+            path: /var/log
+            type: Directory
