@@ -31,6 +31,43 @@
 
 ------
 
+**Решение**
+
+Создал Deployment приложения [deploy_1.yaml](manifests/deploy_1.yaml), состоящего из контейнеров busybox и multitool. 
+
+busybox пишет каждые пять секунд в файл `/data/timestamps.txt` в общей директории `/data`:
+
+```
+while true; do
+  echo "$(date)" >> /data/timestamps.txt;
+  sleep 5;
+done;
+
+```
+
+multitool читает содержимое файла /data/timestamps.txt и отображает его в логах каждые 5 секунд.
+
+```
+while true; do
+  clear;
+  echo "Reading file:";
+  cat /data/timestamps.txt || echo "File not found";
+  sleep 5;
+done;
+```
+
+Проверяю чтение даннх контейнером multitool через чтение логов: 
+
+`kubectl logs -f deployment/multi-container-app -c multitool`
+
+<img src="images/Task_1_1.png" alt="Task_1_1.png" width="300" height="auto"></br>
+
+Никто не мешает проверить содиржимое тома прямо в контейнере multitool: 
+
+`microk8s kubectl exec -it pod/multi-container-app-756c8c6cf6-hwdsc -c multitool -- sh`
+
+<img src="images/Task_1_2.png" alt="Task_1_2.png" width="400" height="auto"></br>
+
 ### Задание 2
 
 **Что нужно сделать**
