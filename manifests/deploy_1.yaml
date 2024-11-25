@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-container-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-container-app
+  template:
+    metadata:
+      labels:
+        app: multi-container-app
+    spec:
+      volumes:
+        - name: shared-data
+          emptyDir: {}
+      containers:
+        - name: busybox
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - >
+              while true; do
+                echo "$(date)" >> /data/timestamps.txt;
+                sleep 5;
+              done;
+          volumeMounts:
+            - name: shared-data
+              mountPath: /data
+        - name: multitool
+          image: praqma/network-multitool
+          command:
+            - /bin/sh
+            - -c
+            - >
+              while true; do
+                clear;
+                echo "Reading file:";
+                cat /data/timestamps.txt || echo "File not found";
+                sleep 5;
+              done;
+          volumeMounts:
+            - name: shared-data
+              mountPath: /data
